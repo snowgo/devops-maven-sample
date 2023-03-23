@@ -10,14 +10,13 @@ pipeline {
     }
 
     environment {
-        DOCKER_CREDENTIAL_ID = 'dockerhub-id'
+        DOCKER_CREDENTIAL_ID = 'robot-test'
         GITHUB_CREDENTIAL_ID = 'github-id'
         KUBECONFIG_CREDENTIAL_ID = 'demo-kubeconfig'
-        REGISTRY = 'docker.io'
-        DOCKERHUB_NAMESPACE = 'docker_username' // change me
-        GITHUB_ACCOUNT = 'kubesphere' // change me
+        REGISTRY = '192.168.77.67:30003'
+        DOCKERHUB_NAMESPACE = 'ks-devops-harbor'
+        GITHUB_ACCOUNT = 'snowgo'
         APP_NAME = 'devops-java-sample'
-        SONAR_CREDENTIAL_ID = 'sonar-token'
     }
 
     stages {
@@ -29,20 +28,7 @@ pipeline {
             }
         }
 
-        stage('sonarqube analysis') {
-            steps {
-                container('maven') {
-                    withCredentials([string(credentialsId: "$SONAR_CREDENTIAL_ID", variable: 'SONAR_TOKEN')]) {
-                        withSonarQubeEnv('sonar') {
-                            sh 'mvn sonar:sonar -Dsonar.login=$SONAR_TOKEN'
-                        }
-                    }
-                    timeout(time: 1, unit: 'HOURS') {
-                        waitForQualityGate abortPipeline: true
-                    }
-                }
-            }
-        }
+
 
         stage('build & push') {
             steps {
